@@ -4,6 +4,7 @@ var augustctl = require('./augustctl');
 var express = require('express');
 var morgan = require('morgan');
 var https = require('https');
+var fs = require('fs');
 var await = require('asyncawait/await');
 var async = require('asyncawait/async');
 var config = require(process.env.AUGUSTCTL_CONFIG || './config.json');
@@ -15,10 +16,12 @@ var app = express();
 app.use(morgan(DEBUG ? 'dev' : 'combined'));
 app.use(require('helmet')());
 
-const sslPath = '/etc/letsencrypt/live/cyrusbowman.asuscomm.com/';
-const options = {
-  cert: fs.readFileSync(sslPath+'fullchain.pem'),
-  key: fs.readFileSync(sslPath+'privkey.pem')
+var sslOptions = null;
+if (config.ssl){
+  sslOptions = {
+    cert: fs.readFileSync(config.ssl.cert),
+    key: fs.readFileSync(config.ssl.key)
+  };
 }
 
 var ret = {'status': -1, 'ret': '', 'msg': ''};
@@ -28,12 +31,17 @@ app.use(express.static('static')); //Server static files from 'static' directory
 
 
 app.use('/api', function (req, res, next) {
-  if (config.serverToken && req.query,token != config.serverToken) {
-    console.log('Failed to authenticate.');
-  } else {
-    console.log('Successfully authenticated.');
+  if (config.serverToken == null) {
+    console.warn('WARNING: No server token provided in config.json');
+    next();
+    return;
   }
-  console.log('Time:', Date.now())
+  if (req.query.token != config.serverToken) {
+    console.log('Failed to authenticate.');
+    res.sendStatus(401);
+    return
+  }
+  console.log('Successfully authenticated.');
   next()
 })
 
@@ -169,4 +177,7 @@ augustctl.scan(config.lockUuid).then(function(peripheral) {
 var server = app.listen(port, address, function() {
   console.log('Listening at %j', server.address());
 });
-https.createServer(options, app).listen(3443);
+
+if (config.ssl) {
+  https.createServer(sslOptions, app).listen(3443);
+}

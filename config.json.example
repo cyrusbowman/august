@@ -1,5 +1,9 @@
 {
   "offlineKey": "",
   "offlineKeyOffset": "1",
-  "serverToken": ""
+  "serverToken": "",
+  "ssl": {
+    "cert": "",
+    "key": ""
+  }
 }
