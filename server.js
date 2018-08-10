@@ -26,6 +26,17 @@ var ret = {'status': -1, 'ret': '', 'msg': ''};
 
 app.use(express.static('static')); //Server static files from 'static' directory
 
+
+app.use('/api', function (req, res, next) {
+  if (config.serverToken && req.query,token != config.serverToken) {
+    console.log('Failed to authenticate.');
+  } else {
+    console.log('Successfully authenticated.');
+  }
+  console.log('Time:', Date.now())
+  next()
+})
+
 app.get('/api/unlock', function(req, res) {
 
   var lock = app.get('lock');
