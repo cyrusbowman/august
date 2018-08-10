@@ -3,6 +3,7 @@
 var augustctl = require('./augustctl');
 var express = require('express');
 var morgan = require('morgan');
+var https = require('https');
 var await = require('asyncawait/await');
 var async = require('asyncawait/async');
 var config = require(process.env.AUGUSTCTL_CONFIG || './config.json');
@@ -12,6 +13,13 @@ var port = config.port || 3000;
 
 var app = express();
 app.use(morgan(DEBUG ? 'dev' : 'combined'));
+app.use(require('helmet')());
+
+const sslPath = '/etc/letsencrypt/live/cyrusbowman.asuscomm.com/';
+const options = {
+  cert: fs.readFileSync(sslPath+'fullchain.pem'),
+  key: fs.readFileSync(sslPath+'privkey.pem')
+}
 
 var ret = {'status': -1, 'ret': '', 'msg': ''};
 
@@ -150,3 +158,4 @@ augustctl.scan(config.lockUuid).then(function(peripheral) {
 var server = app.listen(port, address, function() {
   console.log('Listening at %j', server.address());
 });
+https.createServer(options, app).listen(3443);
