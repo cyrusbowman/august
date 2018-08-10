@@ -15,6 +15,9 @@ app.use(morgan(DEBUG ? 'dev' : 'combined'));
 
 var ret = {'status': -1, 'ret': '', 'msg': ''};
 
+
+app.use(express.static('static')); //Server static files from 'static' directory
+
 app.get('/api/unlock', function(req, res) {
 
   var lock = app.get('lock');
