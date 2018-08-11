@@ -173,7 +173,7 @@ var server = app.listen(port, address, function() {
 var sslTimeout;
 var sslServer;
 if (config.ssl) {
-  sslOptions = {
+  var sslOptions = {
     cert: fs.readFileSync(config.ssl.cert),
     key: fs.readFileSync(config.ssl.key)
   };
