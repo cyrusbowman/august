@@ -16,16 +16,7 @@ var app = express();
 app.use(morgan(DEBUG ? 'dev' : 'combined'));
 app.use(require('helmet')());
 
-var sslOptions = null;
-if (config.ssl){
-  sslOptions = {
-    cert: fs.readFileSync(config.ssl.cert),
-    key: fs.readFileSync(config.ssl.key)
-  };
-}
-
 var ret = {'status': -1, 'ret': '', 'msg': ''};
-
 
 app.use(express.static('static')); //Server static files from 'static' directory
 
@@ -179,6 +170,20 @@ var server = app.listen(port, address, function() {
   console.log('Listening at %j', server.address());
 });
 
+var sslTimeout;
+var sslServer;
 if (config.ssl) {
-  https.createServer(sslOptions, app).listen(3443);
+  sslOptions = {
+    cert: fs.readFileSync(config.ssl.cert),
+    key: fs.readFileSync(config.ssl.key)
+  };
+  sslServer = https.createServer(sslOptions, app).listen(3443);
+  //Reload certs if they change
+  fs.watch(config.ssl.cert, () => {
+    clearTimeout(sslTimeout);
+    sslTimeout = setTimeout(() => {
+      sslServer._sharedCreds.context.setCert(fs.readFileSync(config.ssl.cert));
+      sslServer._sharedCreds.context.setKey(fs.readFileSync(config.ssl.key));
+    }, 1000);
+  });
 }
