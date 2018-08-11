@@ -9,7 +9,7 @@ var await = require('asyncawait/await');
 var async = require('asyncawait/async');
 var config = require(process.env.AUGUSTCTL_CONFIG || './config.json');
 var DEBUG = process.env.NODE_ENV !== 'production';
-var address = config.address || 'localhost';
+var address = config.address || '0.0.0.0';
 var port = config.port || 3000;
 
 var app = express();

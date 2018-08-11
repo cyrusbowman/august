@@ -6,7 +6,6 @@
     "express": "^4.16.3",
     "helmet": "^3.13.0",
     "morgan": "^1.9.0",
-    "noble": "^1.9.1",
-    "xpc-connection": "sandeepmistry/node-xpc-connection#pull/26/head"
+    "noble": "^1.9.1"
   }
 }
