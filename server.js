@@ -77,7 +77,8 @@ app.get('/api/unlock', function(req, res) {
 			else
 			{
 				ret['status'] = 1;
-				ret['msg'] = 'Lock is already locked';
+				ret['msg'] = 'Lock is already unlocked';
+        ret['ret'] = 'unlocked';
 				res.json(ret);
 
 				lock.disconnect();
@@ -124,7 +125,7 @@ app.get('/api/lock', function(req, res) {
 			{
 				ret['status'] = 1;
 				ret['msg'] = 'Lock is already locked';
-
+        ret['ret'] = 'locked';
 				res.json(ret);
 
 				lock.disconnect();
